@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Todo編集</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1 class="page-title">Todo編集</h1>
+
+    <!-- value="{{ todo.〇〇 }}" で今の内容をあらかじめ入力欄に入れておく -->
+    <form class="todo-form" action="{{ url_for('edit', todo_id=todo.id) }}" method="post">
+        <div class="form-group">
+            <label for="title">タイトル</label>
+            <input type="text" id="title" name="title" value="{{ todo.title }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="content">内容</label>
+            <textarea id="content" name="content" rows="4">{{ todo.content }}</textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="due">期日</label>
+            <input type="date" id="due" name="due" value="{{ todo.due }}">
+        </div>
+
+        <button type="submit" class="submit-button">更新する</button>
+    </form>
+
+    <div class="action-buttons">
+        <a href="/add" class="round-button round-button--edit" aria-label="編集">
+            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        </a>
+        <a href="/" class="round-button round-button--home" aria-label="ホーム">
+            <svg viewBox="0 0 24 24"><path d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3z"/></svg>
+        </a>
+    </div>
+</body>
+</html>

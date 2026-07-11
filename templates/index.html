@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Todoリスト</title>
+    <!-- static/style.css を読み込む -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1 class="page-title">Todoリスト</h1>
+
+    <!-- todos（一覧）を1件ずつ繰り返して表示する -->
+    <ul class="todo-list">
+        {% for todo in todos %}
+        <li class="todo-card">
+            <div class="todo-card__header">
+                <span class="todo-card__title">{{ todo.title }}</span>
+                <span class="todo-card__due">期日: {{ todo.due }}</span>
+                <a href="{{ url_for('edit', todo_id=todo.id) }}" class="todo-card__edit-link">編集</a>
+            </div>
+            <div class="todo-card__content">{{ todo.content }}</div>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <!-- 左下の丸ボタン（編集・ホーム）。まだ機能は付けていない見た目だけのボタン -->
+    <div class="action-buttons">
+        <a href="/add" class="round-button round-button--edit" aria-label="編集">
+            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        </a>
+        <a href="/" class="round-button round-button--home" aria-label="ホーム">
+            <svg viewBox="0 0 24 24"><path d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3z"/></svg>
+        </a>
+    </div>
+</body>
+</html>

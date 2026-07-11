@@ -1,0 +1,13 @@
+# 秘密情報（GitHubには絶対に上げない）
+.env
+JSONキー(サービスアカウント原本).json
+*.json.key
+
+# Python関連
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Claude Codeのローカル設定（個人環境ごとの設定なので共有しない）
+.claude/settings.local.json
