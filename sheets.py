@@ -1,6 +1,7 @@
 # Googleスプレッドシートとのやり取りをまとめたファイル
 # app.py からはここに定義した関数を呼び出すだけでよい
 
+import json
 import os
 
 import gspread
@@ -27,13 +28,23 @@ SEED_TODOS = [
 ]
 
 
-def _get_worksheet():
-    # .env に書いた設定を読み込む
-    cred_file = os.getenv("GOOGLE_SERVICE_ACCOUNT_FILE")
-    spreadsheet_id = os.getenv("SPREADSHEET_ID")
-    cred_path = os.path.join(BASE_DIR, cred_file)
+def _get_credentials():
+    # Render等の本番環境では、JSONファイルの代わりに
+    # 環境変数 GOOGLE_SERVICE_ACCOUNT_JSON にJSONの中身をそのまま設定する運用にする
+    cred_json = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
+    if cred_json:
+        return Credentials.from_service_account_info(json.loads(cred_json), scopes=SCOPES)
 
-    creds = Credentials.from_service_account_file(cred_path, scopes=SCOPES)
+    # ローカル開発では .env で指定したJSONファイルを読み込む
+    cred_file = os.getenv("GOOGLE_SERVICE_ACCOUNT_FILE")
+    cred_path = os.path.join(BASE_DIR, cred_file)
+    return Credentials.from_service_account_file(cred_path, scopes=SCOPES)
+
+
+def _get_worksheet():
+    spreadsheet_id = os.getenv("SPREADSHEET_ID")
+
+    creds = _get_credentials()
     client = gspread.authorize(creds)
     worksheet = client.open_by_key(spreadsheet_id).sheet1
 
