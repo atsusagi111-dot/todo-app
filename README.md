@@ -47,7 +47,7 @@ python notify_discord.py today
 python notify_discord.py tomorrow
 ```
 
-### GitHub Actionsで自動実行する設定（毎朝7時 / 前日夜21時、いずれも日本時間）
+### GitHub Actionsで自動実行する設定（毎朝7時5分 / 前日夜21時5分、いずれも日本時間）
 
 `.github/workflows/notify-discord.yml` が、GitHub Actionsのスケジュール実行（`schedule`トリガー）でこのスクリプトを定期実行します。Renderの無料プランのようなスリープが無いため、追加のサーバーやCron Jobサービスは不要です。
 
@@ -58,10 +58,10 @@ python notify_discord.py tomorrow
    DISCORD_WEBHOOK_URL         … DiscordのWebhook URL
    ```
 2. `main`（または既定ブランチ）にpushすると、GitHubが自動的にワークフローを認識する
-3. スケジュールは以下の2本（UTC基準）
+3. スケジュールは以下の2本（UTC基準。GitHubの推奨に従い、混雑しやすい「毎時ちょうど」を避けて5分ずらしている）
    ```
-   0 22 * * *  … 日本時間7:00（当日期日の朝通知）
-   0 12 * * *  … 日本時間21:00（前日期日の夜通知）
+   5 22 * * *  … 日本時間7:05（当日期日の朝通知）
+   5 12 * * *  … 日本時間21:05（前日期日の夜通知）
    ```
 4. 動作確認したいときは、GitHubリポジトリの「Actions」タブ→「Discord期日通知」→「Run workflow」から手動実行できる（`mode`で`today`/`tomorrow`を選択）
 

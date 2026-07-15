@@ -2,10 +2,10 @@ name: Discord期日通知
 
 on:
   schedule:
-    # 日本時間 7:00 = UTC 22:00 … 当日期日の朝通知
-    - cron: "0 22 * * *"
-    # [動作確認のため一時的にこの時刻] 日本時間 22:20 = UTC 13:20 … 前日期日の夜通知
-    - cron: "20 13 * * *"
+    # 日本時間 7:05 = UTC 22:05 … 当日期日の朝通知（GitHubの推奨に従い毎時ちょうどを避けている）
+    - cron: "5 22 * * *"
+    # 日本時間 21:05 = UTC 12:05 … 前日期日の夜通知（同上）
+    - cron: "5 12 * * *"
   workflow_dispatch:
     inputs:
       mode:
@@ -38,9 +38,9 @@ jobs:
           SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          if [ "${{ github.event.schedule }}" = "0 22 * * *" ]; then
+          if [ "${{ github.event.schedule }}" = "5 22 * * *" ]; then
             MODE="today"
-          elif [ "${{ github.event.schedule }}" = "20 13 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "5 12 * * *" ]; then
             MODE="tomorrow"
           else
             MODE="${{ github.event.inputs.mode }}"
