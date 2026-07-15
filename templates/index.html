@@ -17,6 +17,7 @@
                 <input type="checkbox" class="todo-card__checkbox" data-id="{{ todo.id }}" {% if todo.done %}checked{% endif %} aria-label="完了にする">
                 <span class="todo-card__title">{{ todo.title }}</span>
                 <span class="todo-card__due">期日: {{ todo.due }}</span>
+                <span class="todo-card__done-badge">完了</span>
                 <a href="{{ url_for('edit', todo_id=todo.id) }}" class="todo-card__edit-link">編集</a>
             </div>
             <div class="todo-card__content">{{ todo.content }}</div>

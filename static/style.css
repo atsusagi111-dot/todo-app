@@ -69,6 +69,29 @@ body {
     color: #aaa;
 }
 
+/* ☑を付けたTodoカード：一目で完了と分かるようにグレーアウトする */
+.todo-card--done {
+    background-color: #ececec;
+}
+
+.todo-card--done .todo-card__due,
+.todo-card--done .todo-card__content,
+.todo-card--done .todo-card__edit-link {
+    color: #bbb;
+}
+
+/* 期日の横に表示する「完了」の赤文字ラベル */
+.todo-card__done-badge {
+    display: none;
+    font-size: 12px;
+    font-weight: bold;
+    color: #e74c3c;
+}
+
+.todo-card--done .todo-card__done-badge {
+    display: inline;
+}
+
 .todo-card__due {
     font-size: 12px;
     color: #888;
