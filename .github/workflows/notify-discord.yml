@@ -4,8 +4,8 @@ on:
   schedule:
     # 日本時間 7:00 = UTC 22:00 … 当日期日の朝通知
     - cron: "0 22 * * *"
-    # 日本時間 21:00 = UTC 12:00 … 前日期日の夜通知
-    - cron: "0 12 * * *"
+    # [動作確認のため一時的にこの時刻] 日本時間 22:20 = UTC 13:20 … 前日期日の夜通知
+    - cron: "20 13 * * *"
   workflow_dispatch:
     inputs:
       mode:
@@ -40,7 +40,7 @@ jobs:
         run: |
           if [ "${{ github.event.schedule }}" = "0 22 * * *" ]; then
             MODE="today"
-          elif [ "${{ github.event.schedule }}" = "0 12 * * *" ]; then
+          elif [ "${{ github.event.schedule }}" = "20 13 * * *" ]; then
             MODE="tomorrow"
           else
             MODE="${{ github.event.inputs.mode }}"
