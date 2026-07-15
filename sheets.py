@@ -18,14 +18,17 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
 
 # シートの1行目（見出し行）
-HEADER = ["id", "title", "content", "due"]
+HEADER = ["id", "title", "content", "due", "done"]
 
 # 初回セットアップ時に入れておくサンプルデータ
 SEED_TODOS = [
-    [1, "買い物に行く", "牛乳とパンを買う", "2026-07-12"],
-    [2, "レポート提出", "Web開発実践課題のレポートをまとめる", "2026-07-15"],
-    [3, "掃除する", "部屋とキッチンを掃除する", "2026-07-13"],
+    [1, "買い物に行く", "牛乳とパンを買う", "2026-07-12", "FALSE"],
+    [2, "レポート提出", "Web開発実践課題のレポートをまとめる", "2026-07-15", "FALSE"],
+    [3, "掃除する", "部屋とキッチンを掃除する", "2026-07-13", "FALSE"],
 ]
+
+# 完了状態を表す文字列とみなす値
+_TRUE_VALUES = {"TRUE", "1", "DONE"}
 
 
 def _get_credentials():
@@ -49,9 +52,13 @@ def _get_worksheet():
     worksheet = client.open_by_key(spreadsheet_id).sheet1
 
     # 見出し行がまだ無ければ作成し、サンプルデータを入れておく
-    if worksheet.acell("A1").value != "id":
-        worksheet.update("A1:D1", [HEADER])
+    header_row = worksheet.row_values(1)
+    if not header_row or header_row[0] != "id":
+        worksheet.update("A1:E1", [HEADER])
         worksheet.append_rows(SEED_TODOS)
+    elif "done" not in header_row:
+        # 既存のシートに「done」列がまだ無い場合は見出しだけ追加する
+        worksheet.update_acell("E1", "done")
 
     return worksheet
 
@@ -66,6 +73,7 @@ def get_all_todos():
             "title": record["title"],
             "content": record["content"],
             "due": str(record["due"]),
+            "done": str(record.get("done", "")).strip().upper() in _TRUE_VALUES,
         }
         for record in records
     ]
@@ -84,7 +92,7 @@ def add_todo(title, content, due):
     worksheet = _get_worksheet()
     todos = get_all_todos()
     next_id = max([todo["id"] for todo in todos], default=0) + 1
-    worksheet.append_row([next_id, title, content, due])
+    worksheet.append_row([next_id, title, content, due, "FALSE"])
 
 
 def update_todo(todo_id, title, content, due):
@@ -95,3 +103,16 @@ def update_todo(todo_id, title, content, due):
         return False
     worksheet.update(f"A{cell.row}:D{cell.row}", [[todo_id, title, content, due]])
     return True
+
+
+def toggle_todo(todo_id):
+    # 指定したidの完了状態（done）を反転させる。戻り値は反転後の状態
+    worksheet = _get_worksheet()
+    cell = worksheet.find(str(todo_id), in_column=1)
+    if cell is None:
+        return None
+
+    current = str(worksheet.cell(cell.row, 5).value or "").strip().upper() in _TRUE_VALUES
+    new_done = not current
+    worksheet.update_acell(f"E{cell.row}", "TRUE" if new_done else "FALSE")
+    return new_done

@@ -1,7 +1,7 @@
 # Flaskアプリの本体ファイル
 # ここにルーティング（URLとページの対応）を書いていく
 
-from flask import Flask, render_template, request, redirect, url_for, abort
+from flask import Flask, render_template, request, redirect, url_for, abort, jsonify
 
 import sheets
 
@@ -61,6 +61,18 @@ def edit(todo_id):
 
     # GETのときは今の内容を入れたフォーム画面を表示する
     return render_template("edit.html", todo=todo)
+
+
+# Todoの完了状態を切り替えるAPI（一覧の☑をクリックしたときにJSから呼ばれる）
+@app.route("/toggle/<int:todo_id>", methods=["POST"])
+def toggle(todo_id):
+    new_done = sheets.toggle_todo(todo_id)
+
+    # 指定されたidのTodoが存在しない場合は404エラーにする
+    if new_done is None:
+        abort(404)
+
+    return jsonify(done=new_done)
 
 
 # このファイルを直接実行したときだけサーバーを起動する

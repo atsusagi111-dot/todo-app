@@ -51,6 +51,22 @@ body {
     font-size: 17px;
     font-weight: bold;
     color: #333;
+    transition: color 0.2s ease;
+}
+
+/* 完了チェックボックス */
+.todo-card__checkbox {
+    width: 20px;
+    height: 20px;
+    accent-color: #a8c9e6;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* ☑を付けたTodoカード：タイトルに傍線（打ち消し線）を引く */
+.todo-card--done .todo-card__title {
+    text-decoration: line-through;
+    color: #aaa;
 }
 
 .todo-card__due {
@@ -166,4 +182,51 @@ body {
 
 .submit-button:hover {
     opacity: 0.9;
+}
+
+/* ☑を付けたときにポップ表示するウサギ画像 */
+.pop-animation {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.pop-animation img {
+    width: 180px;
+    filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.25));
+}
+
+.pop-animation--show {
+    animation: pop-bounce 1.1s ease forwards;
+}
+
+@keyframes pop-bounce {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 0;
+    }
+    15% {
+        transform: translate(-50%, -50%) scale(1.15);
+        opacity: 1;
+    }
+    30% {
+        transform: translate(-50%, -50%) scale(0.95);
+        opacity: 1;
+    }
+    45% {
+        transform: translate(-50%, -50%) scale(1.05);
+        opacity: 1;
+    }
+    70% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+    }
 }

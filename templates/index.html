@@ -12,8 +12,9 @@
     <!-- todos（一覧）を1件ずつ繰り返して表示する -->
     <ul class="todo-list">
         {% for todo in todos %}
-        <li class="todo-card">
+        <li class="todo-card {% if todo.done %}todo-card--done{% endif %}" data-id="{{ todo.id }}">
             <div class="todo-card__header">
+                <input type="checkbox" class="todo-card__checkbox" data-id="{{ todo.id }}" {% if todo.done %}checked{% endif %} aria-label="完了にする">
                 <span class="todo-card__title">{{ todo.title }}</span>
                 <span class="todo-card__due">期日: {{ todo.due }}</span>
                 <a href="{{ url_for('edit', todo_id=todo.id) }}" class="todo-card__edit-link">編集</a>
@@ -22,6 +23,11 @@
         </li>
         {% endfor %}
     </ul>
+
+    <!-- ☑を付けたときにポップ表示するアニメーション画像 -->
+    <div id="pop-animation" class="pop-animation">
+        <img src="{{ url_for('static', filename='images/rabbit.png') }}" alt="完了！">
+    </div>
 
     <!-- 左下の丸ボタン（編集・ホーム）。まだ機能は付けていない見た目だけのボタン -->
     <div class="action-buttons">
@@ -32,5 +38,45 @@
             <svg viewBox="0 0 24 24"><path d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3z"/></svg>
         </a>
     </div>
+
+    <script>
+        // 一覧の☑をクリックしたら、ページ遷移せずに完了状態を切り替える
+        document.querySelectorAll(".todo-card__checkbox").forEach(function (checkbox) {
+            checkbox.addEventListener("change", function () {
+                var id = checkbox.dataset.id;
+                var card = checkbox.closest(".todo-card");
+                var wasChecked = checkbox.checked;
+
+                fetch("/toggle/" + id, { method: "POST" })
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw new Error("toggle failed");
+                        }
+                        return response.json();
+                    })
+                    .then(function (data) {
+                        card.classList.toggle("todo-card--done", data.done);
+                        checkbox.checked = data.done;
+
+                        // 完了にしたときだけウサギをポップ表示する
+                        if (data.done) {
+                            showPopAnimation();
+                        }
+                    })
+                    .catch(function () {
+                        // 通信に失敗したらチェック状態を元に戻す
+                        checkbox.checked = !wasChecked;
+                    });
+            });
+        });
+
+        function showPopAnimation() {
+            var pop = document.getElementById("pop-animation");
+            pop.classList.remove("pop-animation--show");
+            // 再度アニメーションさせるため、一度リフローを挟んでからクラスを付け直す
+            void pop.offsetWidth;
+            pop.classList.add("pop-animation--show");
+        }
+    </script>
 </body>
 </html>
