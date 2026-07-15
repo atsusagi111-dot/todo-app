@@ -154,6 +154,11 @@ body {
     background-color: #a8e6a1;
 }
 
+/* カレンダーボタン：パステルブルー */
+.round-button--calendar {
+    background-color: #a9d3f5;
+}
+
 /* Todo登録フォーム */
 .todo-form {
     max-width: 480px;
@@ -251,5 +256,111 @@ body {
     100% {
         transform: translate(-50%, -50%) scale(1);
         opacity: 0;
+    }
+}
+
+/* カレンダーページ */
+.calendar-page {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.calendar-nav__link {
+    color: #4a90d9;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.calendar-nav__link:hover {
+    text-decoration: underline;
+}
+
+.calendar-nav__title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #444;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-weekday {
+    text-align: center;
+    font-size: 12px;
+    font-weight: bold;
+    color: #888;
+    padding: 4px 0;
+}
+
+.calendar-day {
+    background-color: #ffffff;
+    border-radius: 8px;
+    min-height: 76px;
+    padding: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.calendar-day--other-month {
+    opacity: 0.4;
+}
+
+.calendar-day--today {
+    outline: 2px solid #a9d3f5;
+    outline-offset: -2px;
+}
+
+.calendar-day__date {
+    font-size: 12px;
+    font-weight: bold;
+    color: #555;
+}
+
+.calendar-day__todos {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 4px;
+}
+
+.calendar-day__todo {
+    display: block;
+    background-color: #eaf3fc;
+    color: #3a6ea5;
+    border-radius: 4px;
+    padding: 2px 4px;
+    font-size: 11px;
+    text-decoration: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.calendar-day__todo--done {
+    background-color: #f0f0f0;
+    color: #aaa;
+    text-decoration: line-through;
+}
+
+/* スマホなど狭い画面ではカレンダーの日付内テキストをさらに詰める */
+@media (max-width: 480px) {
+    .calendar-day {
+        min-height: 60px;
+        padding: 4px;
+    }
+
+    .calendar-day__todo {
+        font-size: 10px;
     }
 }

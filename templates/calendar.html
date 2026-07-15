@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>カレンダー</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1 class="page-title">カレンダー</h1>
+
+    <div class="calendar-page">
+        <div class="calendar-nav">
+            <a href="{{ url_for('calendar_view', year=prev_year, month=prev_month) }}" class="calendar-nav__link">← 前月</a>
+            <span class="calendar-nav__title">{{ year }}年{{ month }}月</span>
+            <a href="{{ url_for('calendar_view', year=next_year, month=next_month) }}" class="calendar-nav__link">次月 →</a>
+        </div>
+
+        <div class="calendar-grid">
+            {% for label in weekday_labels %}
+            <div class="calendar-weekday">{{ label }}</div>
+            {% endfor %}
+
+            {% for week in weeks %}
+                {% for day in week %}
+                <div class="calendar-day {% if day.month != month %}calendar-day--other-month{% endif %} {% if day == today %}calendar-day--today{% endif %}">
+                    <span class="calendar-day__date">{{ day.day }}</span>
+                    {% set day_key = day.isoformat() %}
+                    {% if day_key in todos_by_date %}
+                    <div class="calendar-day__todos">
+                        {% for todo in todos_by_date[day_key] %}
+                        <a href="{{ url_for('edit', todo_id=todo.id) }}" class="calendar-day__todo {% if todo.done %}calendar-day__todo--done{% endif %}">{{ todo.title }}</a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- 左下の丸ボタン（登録・カレンダー・ホーム） -->
+    <div class="action-buttons">
+        <a href="/add" class="round-button round-button--edit" aria-label="登録">
+            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+        </a>
+        <a href="/calendar" class="round-button round-button--calendar" aria-label="カレンダー">
+            <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"/></svg>
+        </a>
+        <a href="/" class="round-button round-button--home" aria-label="ホーム">
+            <svg viewBox="0 0 24 24"><path d="M12 3 2 12h3v8h6v-6h2v6h6v-8h3z"/></svg>
+        </a>
+    </div>
+</body>
+</html>
