@@ -1,0 +1,49 @@
+name: Discord期日通知
+
+on:
+  schedule:
+    # 日本時間 7:00 = UTC 22:00 … 当日期日の朝通知
+    - cron: "0 22 * * *"
+    # 日本時間 21:00 = UTC 12:00 … 前日期日の夜通知
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "通知モード"
+        required: true
+        default: "today"
+        type: choice
+        options:
+          - today
+          - tomorrow
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: リポジトリを取得
+        uses: actions/checkout@v4
+
+      - name: Pythonをセットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: 依存ライブラリをインストール
+        run: pip install -r requirements.txt
+
+      - name: 通知モードを判定して実行
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          if [ "${{ github.event.schedule }}" = "0 22 * * *" ]; then
+            MODE="today"
+          elif [ "${{ github.event.schedule }}" = "0 12 * * *" ]; then
+            MODE="tomorrow"
+          else
+            MODE="${{ github.event.inputs.mode }}"
+          fi
+          echo "実行モード: $MODE"
+          python notify_discord.py "$MODE"

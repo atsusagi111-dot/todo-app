@@ -9,6 +9,7 @@ Flask + Google Sheets APIで作るシンプルなTodoリストWebアプリです
 - Todoの編集
 - Todoの完了チェック（チェックすると傍線＋グレーアウト＋「完了」表示、ポップアニメーション）
 - 期日当日の朝7時（日本時間）にDiscordへ通知
+- 期日前日の夜21時（日本時間）にDiscordへ通知
 - データはGoogleスプレッドシートに保存
 
 ## セットアップ（ローカルで動かす場合）
@@ -32,35 +33,44 @@ Flask + Google Sheets APIで作るシンプルなTodoリストWebアプリです
    ```
 7. ブラウザで `http://127.0.0.1:5000` にアクセス
 
-## Discord通知（期日当日の朝7時）
+## Discord通知（期日当日の朝7時 / 前日の夜21時）
 
-`notify_discord.py` を実行すると、期日が今日で未完了のTodoについて、Discordの指定チャンネルへ「おはようございます。本日Todoリスト○○の実行日です🐇」と通知します。
+`notify_discord.py` はモード引数（`today` / `tomorrow`）を受け取り、Discordの指定チャンネルへ通知します。
+
+- `python notify_discord.py today`（引数省略時のデフォルトも同じ）
+  期日が今日で未完了のTodoについて「おはようございます。本日Todoリスト○○の実行日です🐇」と通知
+- `python notify_discord.py tomorrow`
+  期日が明日で未完了のTodoについて「こんばんは。明日はTodoリスト「○○」の期日です🐇 準備を忘れずに！」と通知
 
 ```
-python notify_discord.py
+python notify_discord.py today
+python notify_discord.py tomorrow
 ```
 
-### Renderで毎朝7時（日本時間）に自動実行する設定
+### GitHub Actionsで自動実行する設定（毎朝7時 / 前日夜21時、いずれも日本時間）
 
-RenderのWebサービスは無料プランだと常時起動していないため、別途「Cron Job」サービスを作成して定期実行します。
+`.github/workflows/notify-discord.yml` が、GitHub Actionsのスケジュール実行（`schedule`トリガー）でこのスクリプトを定期実行します。Renderの無料プランのようなスリープが無いため、追加のサーバーやCron Jobサービスは不要です。
 
-1. Renderのダッシュボードで「New +」→「Cron Job」を選択
-2. このリポジトリを接続
-3. 以下を設定
+1. GitHubリポジトリの「Settings」→「Secrets and variables」→「Actions」→「New repository secret」で、以下の3つを登録する
    ```
-   Build Command: pip install -r requirements.txt
-   Command:       python notify_discord.py
-   Schedule:      0 22 * * *
+   GOOGLE_SERVICE_ACCOUNT_JSON … サービスアカウントJSONキーファイルの中身をそのまま貼り付け
+   SPREADSHEET_ID              … スプレッドシートのID
+   DISCORD_WEBHOOK_URL         … DiscordのWebhook URL
    ```
-   （Renderのスケジュールは協定世界時(UTC)基準のため、日本時間7:00 = UTC 22:00 で `0 22 * * *` と指定する）
-4. 環境変数に、Webサービスと同じ `GOOGLE_SERVICE_ACCOUNT_JSON` と `SPREADSHEET_ID`、加えて `DISCORD_WEBHOOK_URL` を設定する
+2. `main`（または既定ブランチ）にpushすると、GitHubが自動的にワークフローを認識する
+3. スケジュールは以下の2本（UTC基準）
+   ```
+   0 22 * * *  … 日本時間7:00（当日期日の朝通知）
+   0 12 * * *  … 日本時間21:00（前日期日の夜通知）
+   ```
+4. 動作確認したいときは、GitHubリポジトリの「Actions」タブ→「Discord期日通知」→「Run workflow」から手動実行できる（`mode`で`today`/`tomorrow`を選択）
 
 ## 技術構成
 
 - Python / Flask
 - Google Sheets API（gspread）
 - Discord Webhook
-- GitHub / Render
+- GitHub / GitHub Actions / Render
 
 ## 注意
 
